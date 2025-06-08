@@ -1,4 +1,3 @@
-
 export interface Todo {
   id: string;
   text: string;
@@ -6,8 +5,18 @@ export interface Todo {
   createdAt: Date;
 }
 
+export interface TodoType {
+  id: string;
+  title: string;
+  completed: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface TodoListType {
   id: string;
   name: string;
-  todos: Todo[];
+  todos: TodoType[];
+  createdAt: string;
+  updatedAt: string;
 }

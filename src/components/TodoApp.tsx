@@ -21,7 +21,7 @@ const TodoAppContent = () => {
           <ThemeToggle />
         </div>
         {selectedList ? (
-          <TodoList list={selectedList} />
+          <TodoList listId={selectedList.id} />
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">

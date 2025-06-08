@@ -1,18 +1,80 @@
-import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TodoItem from './TodoItem';
 import NewTodoForm from './NewTodoForm';
-import { useTodoStore } from '@/hooks/useTodoStore';
 import type { TodoListType } from '@/types/todo';
+import { getList, updateTodo as updateTodoApi, deleteTodo as deleteTodoApi } from '@/lib/api';
 
 interface TodoListProps {
-  list: TodoListType;
+  listId: string;
 }
 
-const TodoList = ({ list }: TodoListProps) => {
+const TodoList = ({ listId }: TodoListProps) => {
   const [isAdding, setIsAdding] = useState(false);
-  const { updateTodo, deleteTodo } = useTodoStore();
+  const [isCompletedOpen, setIsCompletedOpen] = useState(true);
+  const [list, setList] = useState<TodoListType | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchList = async () => {
+      try {
+        const data = await getList(listId);
+        setList(data);
+        setError(null);
+      } catch (err) {
+        setError('Failed to load todo list');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchList();
+  }, [listId]);
+
+  const handleUpdateTodo = async (todoId: string, updates: Partial<TodoType>) => {
+    if (!list) return;
+    try {
+      const updatedTodo = await updateTodoApi(list.id, todoId, updates);
+      setList(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          todos: prev.todos.map(todo => 
+            todo.id === todoId ? updatedTodo : todo
+          )
+        };
+      });
+    } catch (err) {
+      console.error('Failed to update todo:', err);
+    }
+  };
+
+  const handleDeleteTodo = async (todoId: string) => {
+    if (!list) return;
+    try {
+      await deleteTodoApi(list.id, todoId);
+      setList(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          todos: prev.todos.filter(todo => todo.id !== todoId)
+        };
+      });
+    } catch (err) {
+      console.error('Failed to delete todo:', err);
+    }
+  };
+
+  if (isLoading) {
+    return <div className="flex-1 p-8">Loading...</div>;
+  }
+
+  if (error || !list) {
+    return <div className="flex-1 p-8 text-red-500">{error || 'List not found'}</div>;
+  }
 
   const incompleteTodos = list.todos.filter(todo => !todo.completed);
   const completedTodos = list.todos.filter(todo => todo.completed);
@@ -32,10 +94,9 @@ const TodoList = ({ list }: TodoListProps) => {
           <div className="space-y-2">
             {incompleteTodos.map((todo) => (
               <TodoItem
-                key={todo.id}
                 todo={todo}
-                onUpdate={(updates) => updateTodo(list.id, todo.id, updates)}
-                onDelete={() => deleteTodo(list.id, todo.id)}
+                onUpdate={(updates) => handleUpdateTodo(todo.id, updates)}
+                onDelete={() => handleDeleteTodo(todo.id)}
               />
             ))}
           </div>
@@ -60,20 +121,31 @@ const TodoList = ({ list }: TodoListProps) => {
 
           {/* Completed todos */}
           {completedTodos.length > 0 && (
-            <div className="pt-6 border-t border-border">
-              <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
-                Completed ({completedTodos.length})
-              </h3>
-              <div className="space-y-2">
-                {completedTodos.map((todo) => (
-                  <TodoItem
-                    key={todo.id}
-                    todo={todo}
-                    onUpdate={(updates) => updateTodo(list.id, todo.id, updates)}
-                    onDelete={() => deleteTodo(list.id, todo.id)}
-                  />
-                ))}
-              </div>
+            <div className="space-y-4">
+              <Button
+                variant="ghost"
+                className="w-full flex items-center justify-between text-muted-foreground hover:text-foreground"
+                onClick={() => setIsCompletedOpen(!isCompletedOpen)}
+              >
+                <span>Completed ({completedTodos.length})</span>
+                {isCompletedOpen ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </Button>
+              
+              {isCompletedOpen && (
+                <div className="space-y-4">
+                  {completedTodos.map((todo) => (
+                    <TodoItem
+                      todo={todo}
+                      onUpdate={(updates) => handleUpdateTodo(todo.id, updates)}
+                      onDelete={() => handleDeleteTodo(todo.id)}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
