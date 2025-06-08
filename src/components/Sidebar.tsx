@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Plus, List, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -33,20 +32,20 @@ const Sidebar = ({ selectedListId, onSelectList }: SidebarProps) => {
   };
 
   return (
-    <div className="w-80 bg-white/80 backdrop-blur-sm border-r border-slate-200 p-6 flex flex-col">
+    <div className="w-80 bg-card/80 backdrop-blur-sm border-r border-border p-6 flex flex-col">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800 mb-2">Reminders</h1>
-        <p className="text-sm text-slate-500">Stay organized and productive</p>
+        <h1 className="text-2xl font-bold text-foreground mb-2">Reminders</h1>
+        <p className="text-sm text-muted-foreground">Stay organized and productive</p>
       </div>
 
       <div className="flex-1">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-slate-600 uppercase tracking-wide">My Lists</h2>
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">My Lists</h2>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsCreating(true)}
-            className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
+            className="h-8 w-8 p-0 hover:bg-accent hover:text-accent-foreground"
           >
             <Plus className="h-4 w-4" />
           </Button>
@@ -60,7 +59,7 @@ const Sidebar = ({ selectedListId, onSelectList }: SidebarProps) => {
               className={`group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 ${
                 selectedListId === list.id
                   ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
-                  : 'hover:bg-slate-50 text-slate-700'
+                  : 'hover:bg-accent text-foreground'
               }`}
             >
               <div className="flex items-center space-x-3">
@@ -74,7 +73,7 @@ const Sidebar = ({ selectedListId, onSelectList }: SidebarProps) => {
                 <span className={`text-xs px-2 py-1 rounded-full ${
                   selectedListId === list.id 
                     ? 'bg-white/20 text-white' 
-                    : 'bg-slate-100 text-slate-500'
+                    : 'bg-muted text-muted-foreground'
                 }`}>
                   {list.todos.filter(todo => !todo.completed).length}
                 </span>
@@ -85,7 +84,7 @@ const Sidebar = ({ selectedListId, onSelectList }: SidebarProps) => {
                   className={`h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity ${
                     selectedListId === list.id 
                       ? 'hover:bg-white/20 text-white' 
-                      : 'hover:bg-red-50 hover:text-red-600'
+                      : 'hover:bg-destructive/10 hover:text-destructive'
                   }`}
                 >
                   <Trash2 className="h-3 w-3" />
@@ -96,12 +95,12 @@ const Sidebar = ({ selectedListId, onSelectList }: SidebarProps) => {
         </div>
 
         {isCreating && (
-          <div className="mt-2 p-3 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300">
+          <div className="mt-2 p-3 bg-muted/50 rounded-xl border-2 border-dashed border-border">
             <Input
               value={newListName}
               onChange={(e) => setNewListName(e.target.value)}
               placeholder="List name"
-              className="mb-2 border-none bg-white"
+              className="mb-2 border-none bg-background"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleCreateList();
                 if (e.key === 'Escape') {
@@ -112,7 +111,7 @@ const Sidebar = ({ selectedListId, onSelectList }: SidebarProps) => {
               autoFocus
             />
             <div className="flex space-x-2">
-              <Button onClick={handleCreateList} size="sm" className="bg-blue-500 hover:bg-blue-600">
+              <Button onClick={handleCreateList} size="sm" className="bg-blue-500 hover:bg-blue-600 text-white">
                 Create
               </Button>
               <Button 

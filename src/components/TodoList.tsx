@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,8 +21,8 @@ const TodoList = ({ list }: TodoListProps) => {
     <div className="flex-1 p-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">{list.name}</h1>
-          <p className="text-slate-500">
+          <h1 className="text-3xl font-bold text-foreground mb-2">{list.name}</h1>
+          <p className="text-muted-foreground">
             {incompleteTodos.length} of {list.todos.length} tasks remaining
           </p>
         </div>
@@ -52,7 +51,7 @@ const TodoList = ({ list }: TodoListProps) => {
             <Button
               variant="ghost"
               onClick={() => setIsAdding(true)}
-              className="w-full justify-start p-4 h-auto text-slate-500 hover:text-slate-700 hover:bg-slate-50 border-2 border-dashed border-slate-200 hover:border-slate-300 rounded-xl"
+              className="w-full justify-start p-4 h-auto text-muted-foreground hover:text-foreground hover:bg-accent border-2 border-dashed border-border hover:border-border/80 rounded-xl"
             >
               <Plus className="h-5 w-5 mr-3" />
               Add new task
@@ -61,8 +60,8 @@ const TodoList = ({ list }: TodoListProps) => {
 
           {/* Completed todos */}
           {completedTodos.length > 0 && (
-            <div className="pt-6 border-t border-slate-200">
-              <h3 className="text-sm font-semibold text-slate-500 mb-3 uppercase tracking-wide">
+            <div className="pt-6 border-t border-border">
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
                 Completed ({completedTodos.length})
               </h3>
               <div className="space-y-2">
