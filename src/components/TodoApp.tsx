@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import Sidebar from './Sidebar';
 import TodoList from './TodoList';
-import { useTodoStore } from '@/hooks/useTodoStore';
+import { TodoProvider, useTodoStore } from '@/contexts/TodoContext';
 import { ThemeToggle } from './theme-toggle';
 
-const TodoApp = () => {
+const TodoAppContent = () => {
   const [selectedListId, setSelectedListId] = useState<string | null>(null);
   const { lists } = useTodoStore();
 
@@ -37,6 +37,14 @@ const TodoApp = () => {
         )}
       </main>
     </div>
+  );
+};
+
+const TodoApp = () => {
+  return (
+    <TodoProvider>
+      <TodoAppContent />
+    </TodoProvider>
   );
 };
 
