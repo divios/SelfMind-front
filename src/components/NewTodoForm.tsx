@@ -1,54 +1,61 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useTodoStore } from '@/hooks/useTodoStore';
+import { createTodo } from '@/lib/api';
+import type { TodoType } from '@/types/todo';
 
 interface NewTodoFormProps {
   listId: string;
   onCancel: () => void;
-  onComplete: () => void;
+  onComplete: (newTodo: TodoType) => void;
 }
 
 const NewTodoForm = ({ listId, onCancel, onComplete }: NewTodoFormProps) => {
-  const [text, setText] = useState('');
-  const { addTodo } = useTodoStore();
+  const [title, setTitle] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = () => {
-    if (text.trim()) {
-      addTodo(listId, text.trim());
-      setText('');
-      onComplete();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) return;
+
+    setIsSubmitting(true);
+    try {
+      const newTodo = await createTodo(listId, title.trim());
+      setTitle('');
+      onComplete(newTodo);
+    } catch (err) {
+      console.error('Failed to create todo:', err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleCancel = () => {
-    setText('');
-    onCancel();
-  };
-
   return (
-    <div className="p-4 bg-white rounded-xl border-2 border-blue-200 shadow-sm">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <Input
-        value={text}
-        onChange={(e) => setText(e.target.value)}
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
         placeholder="What needs to be done?"
-        className="mb-3 border-none bg-transparent p-0 text-lg focus-visible:ring-0"
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') handleSubmit();
-          if (e.key === 'Escape') handleCancel();
-        }}
+        disabled={isSubmitting}
         autoFocus
       />
-      <div className="flex space-x-2">
-        <Button onClick={handleSubmit} size="sm" className="bg-blue-500 hover:bg-blue-600">
-          Add Task
-        </Button>
-        <Button variant="ghost" size="sm" onClick={handleCancel}>
+      <div className="flex justify-end space-x-2">
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={onCancel}
+          disabled={isSubmitting}
+        >
           Cancel
         </Button>
+        <Button
+          type="submit"
+          disabled={!title.trim() || isSubmitting}
+        >
+          Add Task
+        </Button>
       </div>
-    </div>
+    </form>
   );
 };
 

@@ -1,13 +1,14 @@
-
-export interface Todo {
+export interface TodoType {
   id: string;
-  text: string;
+  title: string;
   completed: boolean;
-  createdAt: Date;
+  createdAt: string;
 }
 
 export interface TodoListType {
   id: string;
   name: string;
-  todos: Todo[];
+  todos: TodoType[];
+  createdAt: string;
+  updatedAt: string;
 }
