@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { createTodo } from '@/lib/api';
+import type { TodoType } from '@/types/todo';
 
 interface NewTodoFormProps {
   listId: string;
   onCancel: () => void;
-  onComplete: () => void;
+  onComplete: (newTodo: TodoType) => void;
 }
 
 const NewTodoForm = ({ listId, onCancel, onComplete }: NewTodoFormProps) => {
@@ -19,9 +20,9 @@ const NewTodoForm = ({ listId, onCancel, onComplete }: NewTodoFormProps) => {
 
     setIsSubmitting(true);
     try {
-      await createTodo(listId, title.trim());
+      const newTodo = await createTodo(listId, title.trim());
       setTitle('');
-      onComplete();
+      onComplete(newTodo);
     } catch (err) {
       console.error('Failed to create todo:', err);
     } finally {

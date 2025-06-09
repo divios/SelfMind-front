@@ -2,32 +2,42 @@ import { useState } from 'react';
 import { Plus, List, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useTodoStore } from '@/hooks/useTodoStore';
+import type { TodoListType } from '@/types/todo';
 
 interface SidebarProps {
+  lists: TodoListType[];
   selectedListId: string | null;
   onSelectList: (listId: string | null) => void;
+  onCreateList: (name: string) => Promise<void>;
+  onDeleteList: (listId: string) => Promise<void>;
 }
 
-const Sidebar = ({ selectedListId, onSelectList }: SidebarProps) => {
+const Sidebar = ({ lists, selectedListId, onSelectList, onCreateList, onDeleteList }: SidebarProps) => {
   const [isCreating, setIsCreating] = useState(false);
   const [newListName, setNewListName] = useState('');
-  const { lists, addList, deleteList } = useTodoStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleCreateList = () => {
-    if (newListName.trim()) {
-      const newList = addList(newListName.trim());
+  const handleCreateList = async () => {
+    if (!newListName.trim() || isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      await onCreateList(newListName.trim());
       setNewListName('');
       setIsCreating(false);
-      onSelectList(newList.id);
+    } catch (err) {
+      console.error('Failed to create list:', err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleDeleteList = (listId: string, e: React.MouseEvent) => {
+  const handleDeleteList = async (listId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    deleteList(listId);
-    if (selectedListId === listId) {
-      onSelectList(null);
+    try {
+      await onDeleteList(listId);
+    } catch (err) {
+      console.error('Failed to delete list:', err);
     }
   };
 
@@ -108,10 +118,16 @@ const Sidebar = ({ selectedListId, onSelectList }: SidebarProps) => {
                   setNewListName('');
                 }
               }}
+              disabled={isSubmitting}
               autoFocus
             />
             <div className="flex space-x-2">
-              <Button onClick={handleCreateList} size="sm" className="bg-blue-500 hover:bg-blue-600 text-white">
+              <Button 
+                onClick={handleCreateList} 
+                size="sm" 
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+                disabled={!newListName.trim() || isSubmitting}
+              >
                 Create
               </Button>
               <Button 
@@ -121,6 +137,7 @@ const Sidebar = ({ selectedListId, onSelectList }: SidebarProps) => {
                   setIsCreating(false);
                   setNewListName('');
                 }}
+                disabled={isSubmitting}
               >
                 Cancel
               </Button>

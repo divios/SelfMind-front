@@ -3,14 +3,15 @@ import { Plus, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TodoItem from './TodoItem';
 import NewTodoForm from './NewTodoForm';
-import type { TodoListType } from '@/types/todo';
+import type { TodoListType, TodoType } from '@/types/todo';
 import { getList, updateTodo as updateTodoApi, deleteTodo as deleteTodoApi } from '@/lib/api';
 
 interface TodoListProps {
   listId: string;
+  onUpdate?: (updatedList: TodoListType) => void;
 }
 
-const TodoList = ({ listId }: TodoListProps) => {
+const TodoList = ({ listId, onUpdate }: TodoListProps) => {
   const [isAdding, setIsAdding] = useState(false);
   const [isCompletedOpen, setIsCompletedOpen] = useState(true);
   const [list, setList] = useState<TodoListType | null>(null);
@@ -38,15 +39,14 @@ const TodoList = ({ listId }: TodoListProps) => {
     if (!list) return;
     try {
       const updatedTodo = await updateTodoApi(list.id, todoId, updates);
-      setList(prev => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          todos: prev.todos.map(todo => 
-            todo.id === todoId ? updatedTodo : todo
-          )
-        };
-      });
+      const updatedList = {
+        ...list,
+        todos: list.todos.map(todo => 
+          todo.id === todoId ? updatedTodo : todo
+        )
+      };
+      setList(updatedList);
+      onUpdate?.(updatedList);
     } catch (err) {
       console.error('Failed to update todo:', err);
     }
@@ -56,16 +56,26 @@ const TodoList = ({ listId }: TodoListProps) => {
     if (!list) return;
     try {
       await deleteTodoApi(list.id, todoId);
-      setList(prev => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          todos: prev.todos.filter(todo => todo.id !== todoId)
-        };
-      });
+      const updatedList = {
+        ...list,
+        todos: list.todos.filter(todo => todo.id !== todoId)
+      };
+      setList(updatedList);
+      onUpdate?.(updatedList);
     } catch (err) {
       console.error('Failed to delete todo:', err);
     }
+  };
+
+  const handleNewTodo = (newTodo: TodoType) => {
+    if (!list) return;
+    const updatedList = {
+      ...list,
+      todos: [...list.todos, newTodo]
+    };
+    setList(updatedList);
+    onUpdate?.(updatedList);
+    setIsAdding(false);
   };
 
   if (isLoading) {
@@ -94,6 +104,7 @@ const TodoList = ({ listId }: TodoListProps) => {
           <div className="space-y-2">
             {incompleteTodos.map((todo) => (
               <TodoItem
+                key={todo.id}
                 todo={todo}
                 onUpdate={(updates) => handleUpdateTodo(todo.id, updates)}
                 onDelete={() => handleDeleteTodo(todo.id)}
@@ -106,7 +117,7 @@ const TodoList = ({ listId }: TodoListProps) => {
             <NewTodoForm
               listId={list.id}
               onCancel={() => setIsAdding(false)}
-              onComplete={() => setIsAdding(false)}
+              onComplete={handleNewTodo}
             />
           ) : (
             <Button
@@ -139,6 +150,7 @@ const TodoList = ({ listId }: TodoListProps) => {
                 <div className="space-y-4">
                   {completedTodos.map((todo) => (
                     <TodoItem
+                      key={todo.id}
                       todo={todo}
                       onUpdate={(updates) => handleUpdateTodo(todo.id, updates)}
                       onDelete={() => handleDeleteTodo(todo.id)}

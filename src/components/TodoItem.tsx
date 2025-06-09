@@ -2,27 +2,27 @@ import { useState } from 'react';
 import { Trash2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { Todo } from '@/types/todo';
+import type { TodoType } from '@/types/todo';
 
 interface TodoItemProps {
-  todo: Todo;
-  onUpdate: (updates: Partial<Todo>) => void;
+  todo: TodoType;
+  onUpdate: (updates: Partial<TodoType>) => void;
   onDelete: () => void;
 }
 
 const TodoItem = ({ todo, onUpdate, onDelete }: TodoItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editText, setEditText] = useState(todo.text);
+  const [editText, setEditText] = useState(todo.title);
 
   const handleSave = () => {
     if (editText.trim()) {
-      onUpdate({ text: editText.trim() });
+      onUpdate({ title: editText.trim() });
       setIsEditing(false);
     }
   };
 
   const handleCancel = () => {
-    setEditText(todo.text);
+    setEditText(todo.title);
     setIsEditing(false);
   };
 
@@ -65,7 +65,7 @@ const TodoItem = ({ todo, onUpdate, onDelete }: TodoItemProps) => {
                 : 'text-foreground hover:text-foreground/90'
             }`}
           >
-            {todo.text}
+            {todo.title}
           </span>
         )}
       </div>

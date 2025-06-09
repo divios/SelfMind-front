@@ -1,18 +1,28 @@
-# Welcome to your Lovable project
+# SelfMind Frontend
 
-## Project info
+A modern todo list application built with React, TypeScript, and Vite. This application provides a user-friendly interface for managing tasks and to-dos with a beautiful and intuitive design.
 
-**URL**: https://lovable.dev/projects/523483a9-0fa8-4ffc-9096-65444ee8956a
+## Features
 
-## How can I edit this code?
+- Create, read, update, and delete todo items
+- Organize todos with categories and priorities
+- Mark todos as complete/incomplete
+- Set due dates and reminders
+- Filter and search todos
+- Modern, responsive UI with dark mode support
+- Real-time updates and synchronization
+- Copy to clipboard functionality
+- API integration for backend services
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/523483a9-0fa8-4ffc-9096-65444ee8956a) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
+## Development Setup
 
 **Use your preferred IDE**
 
@@ -32,42 +42,69 @@ cd <YOUR_PROJECT_NAME>
 # Step 3: Install the necessary dependencies.
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 4: Create environment files
+# Create .env for development
+cp .env.template .env
+# Edit .env with your development values
+
+# Step 5: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Deployment
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Docker Deployment
 
-**Use GitHub Codespaces**
+The application can be deployed using Docker. The Dockerfile is configured for a multi-stage build that optimizes the production build.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1. Build the Docker image:
+```sh
+# For production
+docker build -t zpl-converter .
 
-## What technologies are used for this project?
+# For development
+docker build --build-arg NODE_ENV=development -t zpl-converter .
+```
 
-This project is built with:
+2. Run the container:
+```sh
+docker run -p 80:80 zpl-converter
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Environment Variables in Docker
 
-## How can I deploy this project?
+When deploying with Docker, you can provide environment variables in several ways:
 
-Simply open [Lovable](https://lovable.dev/projects/523483a9-0fa8-4ffc-9096-65444ee8956a) and click on Share -> Publish.
+1. Using a .env file:
+```sh
+docker run --env-file .env.production -p 80:80 selfmind-frontend
+```
 
-## Can I connect a custom domain to my Lovable project?
+2. Using environment variables directly:
+```sh
+docker run -e VITE_API_BASE_URL=https://api.example.com -e VITE_API_KEY=your_key -p 80:80 selfmind-frontend
+```
 
-Yes, you can!
+### Production Build
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+For a production build without Docker:
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+```sh
+# Create production environment file
+cp .env.example .env.production
+# Edit .env.production with your production values
+
+# Build the application
+npm run build
+
+# The built files will be in the 'dist' directory
+```
+
+### Important Notes
+
+- Never commit `.env` or `.env.production` files to version control
+- Keep your API keys secure and rotate them regularly
+- Use different API keys for development and production environments
+- The application uses environment variables that are embedded at build time
+- For local development, use the development environment variables
+- For production deployment, always use production environment variables

@@ -1,16 +1,8 @@
-export interface Todo {
-  id: string;
-  text: string;
-  completed: boolean;
-  createdAt: Date;
-}
-
 export interface TodoType {
   id: string;
   title: string;
   completed: boolean;
   createdAt: string;
-  updatedAt: string;
 }
 
 export interface TodoListType {
