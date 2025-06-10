@@ -4,6 +4,24 @@ import TodoList from './TodoList';
 import { HeaderActions } from './HeaderActions';
 import { getLists, createList, deleteList } from '@/lib/api';
 import type { TodoListType } from '@/types/todo';
+import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
+import { PanelLeftClose } from 'lucide-react';
+
+const SidebarToggle = () => {
+  const { toggleSidebar } = useSidebar();
+  
+  return (
+    <Button
+      variant="outline"
+      size="icon"
+      onClick={toggleSidebar}
+      className="h-10 w-10 bg-background hover:bg-accent relative z-50 ml-4 mr-8 mt-2"
+    >
+      <PanelLeftClose className="h-5 w-5" />
+    </Button>
+  );
+};
 
 const TodoAppContent = () => {
   const [selectedListId, setSelectedListId] = useState<string | null>(null);
@@ -80,36 +98,45 @@ const TodoAppContent = () => {
   const selectedList = selectedListId ? lists.find(list => list.id === selectedListId) : null;
 
   return (
-    <div className="min-h-screen bg-background flex w-full">
-      <Sidebar 
-        lists={lists}
-        selectedListId={selectedListId}
-        onSelectList={setSelectedListId}
-        onCreateList={handleCreateList}
-        onDeleteList={handleDeleteList}
-      />
-      <main className="flex-1 flex flex-col">
-        <HeaderActions />
-        {selectedList ? (
-          <TodoList 
-            listId={selectedList.id} 
-            onUpdate={handleListUpdate}
-          />
-        ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
-                <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-semibold text-foreground mb-2">Welcome to Reminders</h2>
-              <p className="text-muted-foreground">Select a list to get started, or create a new one.</p>
+    <SidebarProvider defaultOpen={true}>
+      <div className="min-h-screen bg-background flex w-full">
+        <Sidebar 
+          lists={lists}
+          selectedListId={selectedListId}
+          onSelectList={setSelectedListId}
+          onCreateList={handleCreateList}
+          onDeleteList={handleDeleteList}
+        />
+        <div className="flex-1 flex flex-col">
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-8">
+              <SidebarToggle />
             </div>
+            <HeaderActions />
           </div>
-        )}
-      </main>
-    </div>
+          <div className="flex-1 p-2">
+            {selectedList ? (
+              <TodoList
+                listId={selectedList.id}
+                onUpdate={handleListUpdate}
+              />
+            ) : (
+              <div className="flex-1 flex items-center justify-center min-h-[calc(100vh-8rem)]">
+                <div className="text-center">
+                  <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
+                    <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                  </div>
+                  <h2 className="text-2xl font-semibold text-foreground mb-2">Welcome to Reminders</h2>
+                  <p className="text-muted-foreground">Select a list to get started, or create a new one.</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </SidebarProvider>
   );
 };
 
