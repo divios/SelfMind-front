@@ -79,29 +79,29 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
   };
 
   if (isLoading) {
-    return <div className="flex-1 p-8">Loading...</div>;
+    return <div className="flex-1 pt-24 px-12 pb-12">Loading...</div>;
   }
 
   if (error || !list) {
-    return <div className="flex-1 p-8 text-red-500">{error || 'List not found'}</div>;
+    return <div className="flex-1 pt-24 px-12 pb-12 text-red-500">{error || 'List not found'}</div>;
   }
 
   const incompleteTodos = list.todos.filter(todo => !todo.completed);
   const completedTodos = list.todos.filter(todo => todo.completed);
 
   return (
-    <div className="flex-1 p-8">
+    <div className="flex-1 pt-24 px-12 pb-12">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">{list.name}</h1>
-          <p className="text-muted-foreground">
+        <div className="mb-12">
+          <h1 className="text-4xl font-bold text-foreground mb-4">{list.name}</h1>
+          <p className="text-lg text-muted-foreground">
             {incompleteTodos.length} of {list.todos.length} tasks remaining
           </p>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Incomplete todos */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             {incompleteTodos.map((todo) => (
               <TodoItem
                 key={todo.id}
@@ -123,31 +123,31 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
             <Button
               variant="ghost"
               onClick={() => setIsAdding(true)}
-              className="w-full justify-start p-4 h-auto text-muted-foreground hover:text-foreground hover:bg-accent border-2 border-dashed border-border hover:border-border/80 rounded-xl"
+              className="w-full justify-start p-6 h-auto text-muted-foreground hover:text-foreground hover:bg-accent border-2 border-dashed border-border hover:border-border/80 rounded-xl"
             >
-              <Plus className="h-5 w-5 mr-3" />
+              <Plus className="h-6 w-6 mr-3" />
               Add new task
             </Button>
           )}
 
           {/* Completed todos */}
           {completedTodos.length > 0 && (
-            <div className="space-y-4">
+            <div className="space-y-6">
               <Button
                 variant="ghost"
-                className="w-full flex items-center justify-between text-muted-foreground hover:text-foreground"
+                className="w-full flex items-center justify-between text-muted-foreground hover:text-foreground text-lg"
                 onClick={() => setIsCompletedOpen(!isCompletedOpen)}
               >
                 <span>Completed ({completedTodos.length})</span>
                 {isCompletedOpen ? (
-                  <ChevronUp className="h-4 w-4" />
+                  <ChevronUp className="h-5 w-5" />
                 ) : (
-                  <ChevronDown className="h-4 w-4" />
+                  <ChevronDown className="h-5 w-5" />
                 )}
               </Button>
               
               {isCompletedOpen && (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {completedTodos.map((todo) => (
                     <TodoItem
                       key={todo.id}
