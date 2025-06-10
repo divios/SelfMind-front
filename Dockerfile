@@ -1,8 +1,8 @@
 # Stage 1: Builder
 FROM oven/bun:1.1 as builder
 WORKDIR /app
-COPY package.json bun.lockb ./
-RUN bun install --frozen-lockfile
+COPY package.json ./
+RUN bun install
 COPY . .
 
 # Add build argument for environment
