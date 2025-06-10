@@ -79,29 +79,29 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
   };
 
   if (isLoading) {
-    return <div className="flex-1 pt-24 px-12 pb-12">Loading...</div>;
+    return <div className="flex-1 pt-12 px-8 pb-8">Loading...</div>;
   }
 
   if (error || !list) {
-    return <div className="flex-1 pt-24 px-12 pb-12 text-red-500">{error || 'List not found'}</div>;
+    return <div className="flex-1 pt-12 px-8 pb-8 text-red-500">{error || 'List not found'}</div>;
   }
 
   const incompleteTodos = list.todos.filter(todo => !todo.completed);
   const completedTodos = list.todos.filter(todo => todo.completed);
 
   return (
-    <div className="flex-1 pt-24 px-12 pb-12">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-4">{list.name}</h1>
-          <p className="text-lg text-muted-foreground">
+    <div className="flex-1 pt-12 px-8 pb-8">
+      <div className="max-w-3xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">{list.name}</h1>
+          <p className="text-base text-muted-foreground">
             {incompleteTodos.length} of {list.todos.length} tasks remaining
           </p>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Incomplete todos */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             {incompleteTodos.map((todo) => (
               <TodoItem
                 key={todo.id}
