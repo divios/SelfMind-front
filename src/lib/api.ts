@@ -62,6 +62,25 @@ export const login = async (email: string, password: string): Promise<LoginRespo
   return response.data;
 };
 
+interface RegisterResponse {
+  token: string;
+}
+
+export const register = async (email: string, password: string): Promise<void> => {
+  const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ username: email, password }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to register');
+  }
+};
+
 // Lists API
 export const getLists = async (): Promise<TodoListType[]> => {
   const response = await api.get<TodoListType[]>('/api/lists');

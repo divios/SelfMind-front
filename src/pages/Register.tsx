@@ -7,11 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { login } from '@/lib/api';
+import { register, login } from '@/lib/api';
 
-export default function Login() {
+export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login: authLogin } = useAuth();
   const navigate = useNavigate();
@@ -19,20 +20,32 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (password !== confirmPassword) {
+      toast({
+        title: 'Error',
+        description: 'Passwords do not match',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsLoading(true);
     
     try {
+      await register(email, password);
+      // After successful registration, log in the user
       const { token } = await login(email, password);
       authLogin(token);
       navigate('/');
       toast({
         title: 'Success',
-        description: 'You have been logged in successfully.',
+        description: 'Your account has been created successfully.',
       });
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'Failed to login. Please check your credentials and try again.',
+        description: error instanceof Error ? error.message : 'Failed to create account. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -47,8 +60,8 @@ export default function Login() {
       </div>
       <Card className="w-[450px]">
         <CardHeader className="space-y-3">
-          <CardTitle className="text-3xl font-bold text-center">Welcome Back</CardTitle>
-          <CardDescription className="text-lg text-center">Enter your credentials to access your account</CardDescription>
+          <CardTitle className="text-3xl font-bold text-center">Create Account</CardTitle>
+          <CardDescription className="text-lg text-center">Join us and start organizing your tasks</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -78,13 +91,26 @@ export default function Login() {
                 className="h-12 text-lg"
               />
             </div>
+            <div className="space-y-3">
+              <Label htmlFor="confirmPassword" className="text-lg">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Confirm your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                disabled={isLoading}
+                className="h-12 text-lg"
+              />
+            </div>
             <Button type="submit" className="w-full h-12 text-lg" disabled={isLoading}>
-              {isLoading ? 'Logging in...' : 'Login'}
+              {isLoading ? 'Creating account...' : 'Register'}
             </Button>
             <div className="text-center text-base">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-primary hover:underline font-medium">
-                Register
+              Already have an account?{' '}
+              <Link to="/login" className="text-primary hover:underline font-medium">
+                Login
               </Link>
             </div>
           </form>
