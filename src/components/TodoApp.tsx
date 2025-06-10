@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import TodoList from './TodoList';
-import { ThemeToggle } from './theme-toggle';
+import { HeaderActions } from './HeaderActions';
 import { getLists, createList, deleteList } from '@/lib/api';
 import type { TodoListType } from '@/types/todo';
 
@@ -89,9 +89,7 @@ const TodoAppContent = () => {
         onDeleteList={handleDeleteList}
       />
       <main className="flex-1 flex flex-col">
-        <div className="absolute top-4 right-4">
-          <ThemeToggle />
-        </div>
+        <HeaderActions />
         {selectedList ? (
           <TodoList 
             listId={selectedList.id} 
