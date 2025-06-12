@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { createTodo } from '@/lib/api';
 import type { TodoType } from '@/types/todo';
 
@@ -12,6 +13,7 @@ interface NewTodoFormProps {
 
 const NewTodoForm = ({ listId, onCancel, onComplete }: NewTodoFormProps) => {
   const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,8 +22,9 @@ const NewTodoForm = ({ listId, onCancel, onComplete }: NewTodoFormProps) => {
 
     setIsSubmitting(true);
     try {
-      const newTodo = await createTodo(listId, title.trim());
+      const newTodo = await createTodo(listId, title.trim(), description.trim() || undefined);
       setTitle('');
+      setDescription('');
       onComplete(newTodo);
     } catch (err) {
       console.error('Failed to create todo:', err);
@@ -38,6 +41,13 @@ const NewTodoForm = ({ listId, onCancel, onComplete }: NewTodoFormProps) => {
         placeholder="What needs to be done?"
         disabled={isSubmitting}
         autoFocus
+      />
+      <Textarea
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        placeholder="Add a description (optional)"
+        disabled={isSubmitting}
+        className="min-h-[60px] resize-none"
       />
       <div className="flex justify-end space-x-2">
         <Button
