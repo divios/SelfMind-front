@@ -34,7 +34,7 @@ const TodoItem = ({ todo, onUpdate, onDelete }: TodoItemProps) => {
 
   return (
     <div className={`group flex ${
-      isEditing ? 'items-start' : 'items-center'
+      isEditing ? 'items-start' : todo.description ? 'items-start' : 'items-center'
     } space-x-3 p-4 bg-card rounded-xl border transition-all duration-200 hover:shadow-sm ${
       todo.completed ? 'border-border/50 bg-muted/50' : 'border-border hover:border-border/80'
     }`}>
