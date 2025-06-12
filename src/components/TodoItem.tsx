@@ -55,7 +55,7 @@ const TodoItem = ({ todo, onUpdate, onDelete }: TodoItemProps) => {
 
       <div className="flex-1">
         {isEditing ? (
-          <div className="space-y-2 w-full pt-1">
+          <div className="space-y-2 w-full pt-1 pl-9">
             <Input
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
@@ -74,7 +74,7 @@ const TodoItem = ({ todo, onUpdate, onDelete }: TodoItemProps) => {
               value={editDescription}
               onChange={(e) => setEditDescription(e.target.value)}
               placeholder="Add a description..."
-              className="min-h-[60px] resize-none border-none bg-transparent p-0 !text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="h-[140px] overflow-y-auto resize-none border-none bg-transparent p-0 !text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
               style={{ fontSize: '0.875rem' }}
             />
             <div className="flex justify-end space-x-2 mt-2">

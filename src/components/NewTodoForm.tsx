@@ -47,7 +47,7 @@ const NewTodoForm = ({ listId, onCancel, onComplete }: NewTodoFormProps) => {
         onChange={(e) => setDescription(e.target.value)}
         placeholder="Add a description (optional)"
         disabled={isSubmitting}
-        className="min-h-[60px] resize-none"
+        className="h-[140px] overflow-y-auto resize-none border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
       />
       <div className="flex justify-end space-x-2">
         <Button
