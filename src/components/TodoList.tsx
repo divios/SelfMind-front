@@ -90,7 +90,7 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
   const completedTodos = list.todos.filter(todo => todo.completed);
 
   return (
-    <div className="flex-1 pt-12 px-8 pb-8">
+    <div className="flex-1 pt-2 px-8 pb-8">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">{list.name}</h1>

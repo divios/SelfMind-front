@@ -112,8 +112,8 @@ export const getTodos = async (listId: string): Promise<TodoType[]> => {
   return response.data;
 };
 
-export const createTodo = async (listId: string, title: string): Promise<TodoType> => {
-  const response = await api.post<TodoType>(`/api/todos`, { title, completed: false, listId });
+export const createTodo = async (listId: string, title: string, description?: string): Promise<TodoType> => {
+  const response = await api.post<TodoType>(`/api/todos`, { title, description, completed: false, listId });
   return response.data;
 };
 
