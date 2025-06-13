@@ -9,9 +9,10 @@ interface NewTodoFormProps {
   listId: string;
   onCancel: () => void;
   onComplete: (newTodo: TodoType) => void;
+  currentOrder: number;
 }
 
-const NewTodoForm = ({ listId, onCancel, onComplete }: NewTodoFormProps) => {
+const NewTodoForm = ({ listId, onCancel, onComplete, currentOrder }: NewTodoFormProps) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,7 +23,7 @@ const NewTodoForm = ({ listId, onCancel, onComplete }: NewTodoFormProps) => {
 
     setIsSubmitting(true);
     try {
-      const newTodo = await createTodo(listId, title.trim(), description.trim() || undefined);
+      const newTodo = await createTodo(listId, title.trim(), description.trim() || undefined, currentOrder);
       setTitle('');
       setDescription('');
       onComplete(newTodo);

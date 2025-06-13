@@ -7,8 +7,8 @@ import type { TodoType } from '@/types/todo';
 
 interface TodoItemProps {
   todo: TodoType;
-  onUpdate: (updates: Partial<TodoType>) => void;
-  onDelete: () => void;
+  onUpdate: (todoId: string, updates: Partial<TodoType>) => void;
+  onDelete: (todoId: string) => void;
 }
 
 const TodoItem = ({ todo, onUpdate, onDelete }: TodoItemProps) => {
@@ -18,7 +18,7 @@ const TodoItem = ({ todo, onUpdate, onDelete }: TodoItemProps) => {
 
   const handleSave = () => {
     if (editTitle.trim()) {
-      onUpdate({ 
+      onUpdate(todo.id, { 
         title: editTitle.trim(),
         description: editDescription.trim() || undefined
       });
@@ -32,17 +32,31 @@ const TodoItem = ({ todo, onUpdate, onDelete }: TodoItemProps) => {
     setIsEditing(false);
   };
 
+  const handleClick = (e: React.MouseEvent) => {
+    // Prevent click handling if we're dragging
+    if ((e.target as HTMLElement).closest('[data-rbd-drag-handle-draggable-id]')) {
+      return;
+    }
+    setIsEditing(true);
+  };
+
   return (
-    <div className={`group flex ${
-      isEditing ? 'items-start' : todo.description ? 'items-start' : 'items-center'
-    } space-x-3 p-4 bg-card rounded-xl border transition-all duration-200 hover:shadow-sm ${
-      todo.completed ? 'border-border/50 bg-muted/50' : 'border-border hover:border-border/80'
-    }`}>
+    <div 
+      className={`group flex ${
+        isEditing ? 'items-start' : todo.description ? 'items-start' : 'items-center'
+      } space-x-3 p-4 bg-card rounded-xl border transition-all duration-200 hover:shadow-sm ${
+        todo.completed ? 'border-border/50 bg-muted/50' : 'border-border hover:border-border/80'
+      }`}
+      onClick={handleClick}
+    >
       {!isEditing && (
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => onUpdate({ completed: !todo.completed })}
+          onClick={(e) => {
+            e.stopPropagation();
+            onUpdate(todo.id, { completed: !todo.completed });
+          }}
           className={`h-6 w-6 p-0 rounded-full border-2 transition-all duration-200 ${
             todo.completed
               ? 'bg-green-500 border-green-500 text-white hover:bg-green-600'
@@ -82,21 +96,27 @@ const TodoItem = ({ todo, onUpdate, onDelete }: TodoItemProps) => {
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={handleCancel}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCancel();
+                }}
               >
                 Cancel
               </Button>
               <Button
                 type="button"
                 size="sm"
-                onClick={handleSave}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSave();
+                }}
               >
                 Save
               </Button>
             </div>
           </div>
         ) : (
-          <div onClick={() => setIsEditing(true)} className="cursor-text w-full">
+          <div className="cursor-text w-full">
             {todo.description ? (
               <>
                 <span
@@ -132,7 +152,10 @@ const TodoItem = ({ todo, onUpdate, onDelete }: TodoItemProps) => {
       <Button
         variant="ghost"
         size="sm"
-        onClick={onDelete}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete(todo.id);
+        }}
         className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10 hover:text-destructive"
       >
         <Trash2 className="h-4 w-4" />
