@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import TodoItem from './TodoItem';
 import NewTodoForm from './NewTodoForm';
 import type { TodoListType, TodoType } from '@/types/todo';
-import { getList, updateTodo as updateTodoApi, deleteTodo as deleteTodoApi } from '@/lib/api';
+import { getList, updateTodo as updateTodoApi, deleteTodo as deleteTodoApi, updateTodoOrder } from '@/lib/api';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 
 interface TodoListProps {
@@ -160,11 +160,7 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
 
     // Update the order in the backend
     try {
-      await Promise.all(
-        updatedItems.map(item => 
-          updateTodoApi(list.id, item.id, { order: item.order })
-        )
-      );
+      await updateTodoOrder(reorderedItem.id, result.destination.index);
     } catch (err) {
       console.error('Failed to update todo order:', err);
     }
