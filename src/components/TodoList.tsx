@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import TodoItem from './TodoItem';
 import NewTodoForm from './NewTodoForm';
 import type { TodoListType, TodoType } from '@/types/todo';
-import { getList, updateTodo as updateTodoApi, deleteTodo as deleteTodoApi, updateTodoOrder } from '@/lib/api';
+import { getList, updateTodo as updateTodoApi, deleteTodo as deleteTodoApi, updateTodoOrder, getTodos } from '@/lib/api';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 
 interface TodoListProps {
@@ -73,11 +73,7 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
     const fetchList = async () => {
       try {
         const data = await getList(listId);
-        // Sort todos by order and ensure IDs are strings
-        data.todos = data.todos.map(todo => ({
-          ...todo,
-          id: String(todo.id)
-        })).sort((a, b) => a.order - b.order);
+
         setList(data);
         setError(null);
       } catch (err) {
@@ -94,15 +90,12 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
   const handleUpdateTodo = async (todoId: string, updates: Partial<TodoType>) => {
     if (!list) return;
     try {
-      const updatedTodo = await updateTodoApi(list.id, todoId, updates);
-      const updatedList = {
-        ...list,
-        todos: list.todos.map(todo => 
-          todo.id === todoId ? updatedTodo : todo
-        )
-      };
+      await updateTodoApi(list.id, todoId, updates);
+      const updatedList = await getList(listId)
+
       setList(updatedList);
       onUpdate?.(updatedList);
+
     } catch (err) {
       console.error('Failed to update todo:', err);
     }
@@ -112,23 +105,20 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
     if (!list) return;
     try {
       await deleteTodoApi(list.id, todoId);
-      const updatedList = {
-        ...list,
-        todos: list.todos.filter(todo => todo.id !== todoId)
-      };
+      const updatedList = await getList(listId)
+
       setList(updatedList);
       onUpdate?.(updatedList);
+
     } catch (err) {
       console.error('Failed to delete todo:', err);
     }
   };
 
-  const handleNewTodo = (newTodo: TodoType) => {
+  const handleNewTodo = async (newTodo: TodoType) => {
     if (!list) return;
-    const updatedList = {
-      ...list,
-      todos: [...list.todos, { ...newTodo, id: String(newTodo.id) }]
-    };
+    const updatedList = await getList(listId)
+
     setList(updatedList);
     onUpdate?.(updatedList);
     setIsAdding(false);
@@ -144,23 +134,20 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
-    // Update order for all affected items
-    const updatedItems = items.map((item, index) => ({
-      ...item,
-      order: index
-    }));
-
-    // Update the list state immediately for smooth UI
-    const updatedList = {
+    // Update list for smooth ui
+    setList({
       ...list,
-      todos: updatedItems
-    };
-    setList(updatedList);
-    onUpdate?.(updatedList);
+      todos: items
+    })
 
     // Update the order in the backend
     try {
       await updateTodoOrder(reorderedItem.id, result.destination.index);
+      const updatedList = await getList(listId)
+
+      setList(updatedList);
+      onUpdate?.(updatedList);
+
     } catch (err) {
       console.error('Failed to update todo order:', err);
     }
@@ -230,7 +217,7 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
                   <ChevronDown className="h-5 w-5" />
                 )}
               </Button>
-              
+
               {isCompletedOpen && (
                 <div className="space-y-3">
                   {completedTodos.map((todo) => (
