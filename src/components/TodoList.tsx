@@ -1,15 +1,66 @@
 import { useState, useEffect } from 'react';
-import { Plus, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, ChevronDown, ChevronUp, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TodoItem from './TodoItem';
 import NewTodoForm from './NewTodoForm';
 import type { TodoListType, TodoType } from '@/types/todo';
-import { getList, updateTodo as updateTodoApi, deleteTodo as deleteTodoApi } from '@/lib/api';
+import { getList, updateTodo as updateTodoApi, deleteTodo as deleteTodoApi, updateTodoOrder, getTodos } from '@/lib/api';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 
 interface TodoListProps {
   listId: string;
   onUpdate?: (updatedList: TodoListType) => void;
 }
+
+interface DraggableTodoListProps {
+  todos: TodoType[];
+  onDragEnd: (result: DropResult) => void;
+  onUpdate: (todoId: string, updates: Partial<TodoType>) => void;
+  onDelete: (todoId: string) => void;
+}
+
+const DraggableTodoList = ({ todos, onDragEnd, onUpdate, onDelete }: DraggableTodoListProps) => {
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Droppable droppableId="todos">
+        {(provided) => (
+          <div
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            className="space-y-2"
+          >
+            {todos.map((todo, index) => (
+              <Draggable key={todo.id} draggableId={todo.id} index={index}>
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    className={`flex items-center group relative ${snapshot.isDragging ? 'opacity-50' : ''}`}
+                  >
+                    <div
+                      {...provided.dragHandleProps}
+                      className="absolute -left-8 top-1/2 -translate-y-1/2 cursor-grab text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <GripVertical className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1">
+                      <TodoItem
+                        todo={todo}
+                        onUpdate={onUpdate}
+                        onDelete={onDelete}
+                      />
+                    </div>
+                  </div>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
+  );
+};
 
 const TodoList = ({ listId, onUpdate }: TodoListProps) => {
   const [isAdding, setIsAdding] = useState(false);
@@ -22,6 +73,7 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
     const fetchList = async () => {
       try {
         const data = await getList(listId);
+
         setList(data);
         setError(null);
       } catch (err) {
@@ -38,15 +90,12 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
   const handleUpdateTodo = async (todoId: string, updates: Partial<TodoType>) => {
     if (!list) return;
     try {
-      const updatedTodo = await updateTodoApi(list.id, todoId, updates);
-      const updatedList = {
-        ...list,
-        todos: list.todos.map(todo => 
-          todo.id === todoId ? updatedTodo : todo
-        )
-      };
+      await updateTodoApi(list.id, todoId, updates);
+      const updatedList = await getList(listId)
+
       setList(updatedList);
       onUpdate?.(updatedList);
+
     } catch (err) {
       console.error('Failed to update todo:', err);
     }
@@ -56,26 +105,52 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
     if (!list) return;
     try {
       await deleteTodoApi(list.id, todoId);
-      const updatedList = {
-        ...list,
-        todos: list.todos.filter(todo => todo.id !== todoId)
-      };
+      const updatedList = await getList(listId)
+
       setList(updatedList);
       onUpdate?.(updatedList);
+
     } catch (err) {
       console.error('Failed to delete todo:', err);
     }
   };
 
-  const handleNewTodo = (newTodo: TodoType) => {
+  const handleNewTodo = async (newTodo: TodoType) => {
     if (!list) return;
-    const updatedList = {
-      ...list,
-      todos: [...list.todos, newTodo]
-    };
+    const updatedList = await getList(listId)
+
     setList(updatedList);
     onUpdate?.(updatedList);
     setIsAdding(false);
+  };
+
+  const handleDragEnd = async (result: DropResult) => {
+    if (!result.destination || !list) return;
+
+    // Handle reordering
+    if (result.destination.index === result.source.index) return;
+
+    const items = Array.from(list.todos);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    // Update list for smooth ui
+    setList({
+      ...list,
+      todos: items
+    })
+
+    // Update the order in the backend
+    try {
+      await updateTodoOrder(reorderedItem.id, result.destination.index);
+      const updatedList = await getList(listId)
+
+      setList(updatedList);
+      onUpdate?.(updatedList);
+
+    } catch (err) {
+      console.error('Failed to update todo order:', err);
+    }
   };
 
   if (isLoading) {
@@ -101,16 +176,12 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
 
         <div className="space-y-6">
           {/* Incomplete todos */}
-          <div className="space-y-2">
-            {incompleteTodos.map((todo) => (
-              <TodoItem
-                key={todo.id}
-                todo={todo}
-                onUpdate={(updates) => handleUpdateTodo(todo.id, updates)}
-                onDelete={() => handleDeleteTodo(todo.id)}
-              />
-            ))}
-          </div>
+          <DraggableTodoList
+            todos={incompleteTodos}
+            onDragEnd={handleDragEnd}
+            onUpdate={handleUpdateTodo}
+            onDelete={handleDeleteTodo}
+          />
 
           {/* Add new todo */}
           {isAdding ? (
@@ -118,6 +189,7 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
               listId={list.id}
               onCancel={() => setIsAdding(false)}
               onComplete={handleNewTodo}
+              currentOrder={incompleteTodos.length}
             />
           ) : (
             <Button
@@ -145,15 +217,15 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
                   <ChevronDown className="h-5 w-5" />
                 )}
               </Button>
-              
+
               {isCompletedOpen && (
                 <div className="space-y-3">
                   {completedTodos.map((todo) => (
                     <TodoItem
                       key={todo.id}
                       todo={todo}
-                      onUpdate={(updates) => handleUpdateTodo(todo.id, updates)}
-                      onDelete={() => handleDeleteTodo(todo.id)}
+                      onUpdate={handleUpdateTodo}
+                      onDelete={handleDeleteTodo}
                     />
                   ))}
                 </div>
