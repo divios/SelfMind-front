@@ -112,8 +112,8 @@ export const getTodos = async (listId: string): Promise<TodoType[]> => {
   return response.data;
 };
 
-export const createTodo = async (listId: string, title: string): Promise<TodoType> => {
-  const response = await api.post<TodoType>(`/api/todos`, { title, completed: false, listId });
+export const createTodo = async (listId: string, title: string, description?: string, order?: number): Promise<TodoType> => {
+  const response = await api.post<TodoType>(`/api/todos`, { title, description, completed: false, listId, order });
   return response.data;
 };
 
@@ -124,4 +124,9 @@ export const updateTodo = async (listId: string, todoId: string, updates: Partia
 
 export const deleteTodo = async (listId: string, todoId: string): Promise<void> => {
   await api.delete(`/api/todos/${todoId}`);
+};
+
+export const updateTodoOrder = async (todoId: string, newOrder: number): Promise<TodoType> => {
+  const response = await api.put<TodoType>(`/api/todos/${todoId}/${newOrder}`);
+  return response.data;
 }; 

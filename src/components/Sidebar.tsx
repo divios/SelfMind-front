@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Plus, List, Trash2 } from 'lucide-react';
+import { Plus, List, Trash2, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { TodoListType } from '@/types/todo';
+import ProfileDropdown from './ProfileDropdown';
 
 interface SidebarProps {
   lists: TodoListType[];
@@ -42,22 +43,27 @@ const Sidebar = ({ lists, selectedListId, onSelectList, onCreateList, onDeleteLi
   };
 
   return (
-    <div className="w-80 bg-card/80 backdrop-blur-sm border-r border-border p-6 flex flex-col">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground mb-2">Reminders</h1>
-        <p className="text-sm text-muted-foreground">Stay organized and productive</p>
+    <div className="w-full md:w-80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-r border-slate-200 dark:border-slate-700 p-4 md:p-6 flex flex-col h-full">
+      <div className="mb-6 md:mb-8">
+        <div className="flex flex-col items-center mb-4">
+          <ProfileDropdown />
+        </div>
+        <div className="text-center">
+          <h1 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-200 mb-2">Reminders</h1>
+          <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400">Stay organized and productive</p>
+        </div>
       </div>
 
       <div className="flex-1">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">My Lists</h2>
+          <h2 className="text-xs md:text-sm font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide">My Lists</h2>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsCreating(true)}
-            className="h-8 w-8 p-0 hover:bg-accent hover:text-accent-foreground"
+            className="h-7 w-7 md:h-8 md:w-8 p-0 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-3 w-3 md:h-4 md:w-4" />
           </Button>
         </div>
 
@@ -66,24 +72,24 @@ const Sidebar = ({ lists, selectedListId, onSelectList, onCreateList, onDeleteLi
             <div
               key={list.id}
               onClick={() => onSelectList(list.id)}
-              className={`group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 ${
+              className={`group flex items-center justify-between p-2 md:p-3 rounded-xl cursor-pointer transition-all duration-200 ${
                 selectedListId === list.id
                   ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
-                  : 'hover:bg-accent text-foreground'
+                  : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
               }`}
             >
-              <div className="flex items-center space-x-3">
-                <div className={`w-2 h-2 rounded-full ${
+              <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
+                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
                   selectedListId === list.id ? 'bg-white' : 'bg-blue-500'
                 }`} />
-                <List className="h-4 w-4" />
-                <span className="font-medium">{list.name}</span>
+                <List className="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
+                <span className="font-medium text-sm md:text-base truncate">{list.name}</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className={`text-xs px-2 py-1 rounded-full ${
+              <div className="flex items-center space-x-1 md:space-x-2 flex-shrink-0">
+                <span className={`text-xs px-1.5 md:px-2 py-0.5 md:py-1 rounded-full ${
                   selectedListId === list.id 
                     ? 'bg-white/20 text-white' 
-                    : 'bg-muted text-muted-foreground'
+                    : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
                 }`}>
                   {list.todos.filter(todo => !todo.completed).length}
                 </span>
@@ -91,13 +97,13 @@ const Sidebar = ({ lists, selectedListId, onSelectList, onCreateList, onDeleteLi
                   variant="ghost"
                   size="sm"
                   onClick={(e) => handleDeleteList(list.id, e)}
-                  className={`h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity ${
+                  className={`h-5 w-5 md:h-6 md:w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity ${
                     selectedListId === list.id 
                       ? 'hover:bg-white/20 text-white' 
-                      : 'hover:bg-destructive/10 hover:text-destructive'
+                      : 'hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400'
                   }`}
                 >
-                  <Trash2 className="h-3 w-3" />
+                  <Trash2 className="h-2.5 w-2.5 md:h-3 md:w-3" />
                 </Button>
               </div>
             </div>
@@ -105,12 +111,12 @@ const Sidebar = ({ lists, selectedListId, onSelectList, onCreateList, onDeleteLi
         </div>
 
         {isCreating && (
-          <div className="mt-2 p-3 bg-muted/50 rounded-xl border-2 border-dashed border-border">
+          <div className="mt-2 p-2 md:p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600">
             <Input
               value={newListName}
               onChange={(e) => setNewListName(e.target.value)}
               placeholder="List name"
-              className="mb-2 border-none bg-background"
+              className="mb-2 border-none bg-white dark:bg-slate-700 text-sm"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleCreateList();
                 if (e.key === 'Escape') {
@@ -118,16 +124,10 @@ const Sidebar = ({ lists, selectedListId, onSelectList, onCreateList, onDeleteLi
                   setNewListName('');
                 }
               }}
-              disabled={isSubmitting}
               autoFocus
             />
             <div className="flex space-x-2">
-              <Button 
-                onClick={handleCreateList} 
-                size="sm" 
-                className="bg-blue-500 hover:bg-blue-600 text-white"
-                disabled={!newListName.trim() || isSubmitting}
-              >
+              <Button onClick={handleCreateList} size="sm" className="bg-blue-500 hover:bg-blue-600 text-xs md:text-sm">
                 Create
               </Button>
               <Button 
@@ -137,7 +137,7 @@ const Sidebar = ({ lists, selectedListId, onSelectList, onCreateList, onDeleteLi
                   setIsCreating(false);
                   setNewListName('');
                 }}
-                disabled={isSubmitting}
+                className="text-xs md:text-sm"
               >
                 Cancel
               </Button>
