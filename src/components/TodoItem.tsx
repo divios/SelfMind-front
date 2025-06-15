@@ -44,8 +44,8 @@ const TodoItem = ({ todo, onUpdate, onDelete }: TodoItemProps) => {
     <div 
       className={`group flex ${
         isEditing ? 'items-start' : todo.description ? 'items-start' : 'items-center'
-      } space-x-3 p-4 bg-card rounded-xl border transition-all duration-200 hover:shadow-sm ${
-        todo.completed ? 'border-border/50 bg-muted/50' : 'border-border hover:border-border/80'
+      } space-x-3 p-4 bg-card dark:bg-[#1E293B] rounded-xl border dark:border-white/10 transition-all duration-200 hover:shadow-sm ${
+        todo.completed ? 'border-border/50 bg-muted/50 dark:bg-[#1E293B]/50 dark:border-white/5' : 'border-border hover:border-border/80 dark:hover:border-white/20'
       }`}
       onClick={handleClick}
     >
@@ -60,7 +60,7 @@ const TodoItem = ({ todo, onUpdate, onDelete }: TodoItemProps) => {
           className={`h-6 w-6 p-0 rounded-full border-2 transition-all duration-200 ${
             todo.completed
               ? 'bg-green-500 border-green-500 text-white hover:bg-green-600'
-              : 'border-border hover:border-green-400 hover:bg-green-50/50'
+              : 'border-border dark:border-white/20 hover:border-green-400 hover:bg-green-50/30 dark:hover:border-white/20'
           }`}
         >
           {todo.completed && <Check className="h-3 w-3" />}

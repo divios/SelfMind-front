@@ -64,7 +64,7 @@ const DraggableTodoList = ({ todos, onDragEnd, onUpdate, onDelete }: DraggableTo
 
 const TodoList = ({ listId, onUpdate }: TodoListProps) => {
   const [isAdding, setIsAdding] = useState(false);
-  const [isCompletedOpen, setIsCompletedOpen] = useState(true);
+  const [isCompletedOpen, setIsCompletedOpen] = useState(false);
   const [list, setList] = useState<TodoListType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -165,7 +165,7 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
   const completedTodos = list.todos.filter(todo => todo.completed);
 
   return (
-    <div className="flex-1 pt-2 px-8 pb-8">
+    <div className="flex-1 pt-12 px-8 pb-8">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">{list.name}</h1>
@@ -195,7 +195,7 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
             <Button
               variant="ghost"
               onClick={() => setIsAdding(true)}
-              className="w-full justify-start p-6 h-auto text-muted-foreground hover:text-foreground hover:bg-accent border-2 border-dashed border-border hover:border-border/80 rounded-xl"
+              className="w-full justify-start p-6 h-auto text-muted-foreground hover:text-foreground hover:bg-accent border-2 border-dashed border-border dark:border-white/20 hover:border-border/80 dark:hover:border-white/50 rounded-xl"
             >
               <Plus className="h-6 w-6 mr-3" />
               Add new task
