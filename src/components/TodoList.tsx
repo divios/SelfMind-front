@@ -182,6 +182,7 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
               <Button
                 size="icon"
                 variant="ghost"
+                aria-label="Save list name"
                 onClick={async () => {
                   if (newName.trim() === '') {
                     alert('List title cannot be empty.');
