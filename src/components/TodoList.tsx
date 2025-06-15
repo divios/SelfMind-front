@@ -183,6 +183,10 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
                 size="icon"
                 variant="ghost"
                 onClick={async () => {
+                  if (newName.trim() === '') {
+                    alert('List title cannot be empty.');
+                    return;
+                  }
                   try {
                     await updateList(list.id, newName);
                     const updatedList = await getList(listId);
