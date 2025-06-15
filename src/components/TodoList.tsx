@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Plus, ChevronDown, ChevronUp, GripVertical } from 'lucide-react';
+import { Plus, ChevronDown, ChevronUp, GripVertical, Pencil, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import TodoItem from './TodoItem';
 import NewTodoForm from './NewTodoForm';
 import type { TodoListType, TodoType } from '@/types/todo';
-import { getList, updateTodo as updateTodoApi, deleteTodo as deleteTodoApi, updateTodoOrder, getTodos } from '@/lib/api';
+import { getList, updateTodo as updateTodoApi, deleteTodo as deleteTodoApi, updateTodoOrder, getTodos, updateList } from '@/lib/api';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 
 interface TodoListProps {
@@ -68,6 +69,8 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
   const [list, setList] = useState<TodoListType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newName, setNewName] = useState('');
 
   useEffect(() => {
     const fetchList = async () => {
@@ -168,7 +171,58 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
     <div className="flex-1 pt-12 px-8 pb-8">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">{list.name}</h1>
+          {isEditing ? (
+            <div className="flex items-center gap-2 mb-2">
+              <Input
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                className="text-3xl font-bold h-auto py-0"
+                autoFocus
+              />
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={async () => {
+                  try {
+                    await updateList(list.id, newName);
+                    const updatedList = await getList(listId);
+                    setList(updatedList);
+                    onUpdate?.(updatedList);
+                    setIsEditing(false);
+                  } catch (err) {
+                    console.error('Failed to update list name:', err);
+                  }
+                }}
+              >
+                <Check className="h-4 w-4" />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => {
+                  setIsEditing(false);
+                  setNewName(list.name);
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 mb-2 group">
+              <h1 className="text-3xl font-bold text-foreground">{list.name}</h1>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={() => {
+                  setNewName(list.name);
+                  setIsEditing(true);
+                }}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
           <p className="text-base text-muted-foreground">
             {incompleteTodos.length} of {list.todos.length} tasks remaining
           </p>
