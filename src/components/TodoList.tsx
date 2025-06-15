@@ -204,6 +204,7 @@ const TodoList = ({ listId, onUpdate }: TodoListProps) => {
               <Button
                 size="icon"
                 variant="ghost"
+                aria-label="Cancel rename"
                 onClick={() => {
                   setIsEditing(false);
                   setNewName(list.name);
